@@ -1,0 +1,21 @@
+.profile-page .page-header { margin-bottom: 1.5rem; }
+.profile-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; }
+.profile-card {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 1.25rem;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+.profile-card h2 { margin: 0 0 1rem; font-size: 1rem; color: #1e293b; }
+.profile-form label { display: block; margin-bottom: 1rem; font-size: 0.875rem; color: #475569; }
+.profile-form input {
+  width: 100%; margin-top: 0.35rem; padding: 0.6rem 0.75rem;
+  border: 1px solid #e2e8f0; border-radius: 8px; font-size: 1rem; box-sizing: border-box;
+}
+.profile-form input:focus { outline: none; border-color: #0ea5e9; }
+.btn-primary {
+  margin-top: 0.5rem; padding: 0.65rem 1.25rem; background: #0ea5e9; color: #fff;
+  border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
+}
+.btn-primary:hover { background: #0284c7; }
