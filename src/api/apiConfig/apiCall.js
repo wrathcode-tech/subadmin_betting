@@ -1,13 +1,12 @@
 import axios from "axios";
-import { alertErrorMessage } from "../../customComponents/CustomAlertMessage";
 import { ApiConfig } from "../apiConfig/apiConfig";
 
 // Default timeout of 30 seconds
 const TIMEOUT = 30000;
 
 const tokenExpire = () => {
-  alertErrorMessage('Token is Expired Please Login Again');
   sessionStorage.clear();
+  localStorage.removeItem("bookie_subadmin");
   window.location.reload();
 };
 

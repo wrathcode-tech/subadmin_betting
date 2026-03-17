@@ -1,0 +1,252 @@
+/* ========== Premium Settlement Details Page ========== */
+
+.settlement-premium {
+  --settlement-bg: #f1f5f9;
+  --settlement-card-bg: #ffffff;
+  --settlement-border: #e2e8f0;
+  --settlement-text: #0f172a;
+  --settlement-text-muted: #64748b;
+  --settlement-accent: #0f172a;
+  --settlement-green: #059669;
+  --settlement-green-bg: #ecfdf5;
+  --settlement-amber: #b45309;
+  --settlement-amber-bg: #fffbeb;
+  --settlement-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  --settlement-shadow-lg: 0 4px 20px rgba(0, 0, 0, 0.08);
+  --settlement-radius: 12px;
+  --settlement-radius-sm: 8px;
+}
+
+.settlement-details-page {
+  min-height: 100%;
+  padding-bottom: 2rem;
+}
+
+/* ----- Page header ----- */
+.settlement-page-header {
+  margin-bottom: 1.75rem;
+}
+
+.settlement-header-content {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+}
+
+.settlement-header-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 48px;
+  height: 48px;
+  background: var(--settlement-accent);
+  color: #fff;
+  font-size: 1.25rem;
+  font-weight: 600;
+  border-radius: var(--settlement-radius-sm);
+  flex-shrink: 0;
+}
+
+.settlement-title {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: var(--settlement-text);
+}
+
+.settlement-subtitle {
+  margin: 0.35rem 0 0;
+  font-size: 0.9375rem;
+  color: var(--settlement-text-muted);
+}
+
+/* ----- Loading state ----- */
+.settlement-loading-state {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1.25rem;
+  background: var(--settlement-card-bg);
+  border: 1px solid var(--settlement-border);
+  border-radius: var(--settlement-radius);
+  box-shadow: var(--settlement-shadow);
+}
+
+.settlement-loading-spinner {
+  width: 22px;
+  height: 22px;
+  border: 2px solid var(--settlement-border);
+  border-top-color: var(--settlement-accent);
+  border-radius: 50%;
+  animation: settlement-spin 0.7s linear infinite;
+}
+
+@keyframes settlement-spin {
+  to { transform: rotate(360deg); }
+}
+
+.settlement-loading {
+  margin: 0;
+  font-size: 0.9375rem;
+  color: var(--settlement-text-muted);
+}
+
+.settlement-error {
+  margin: 0 0 1rem;
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--settlement-radius-sm);
+  font-size: 0.9375rem;
+  color: #dc2626;
+}
+
+/* ----- DataTable card ----- */
+.settlement-datatable-card {
+  background: var(--settlement-card-bg);
+  border: 1px solid var(--settlement-border);
+  border-radius: var(--settlement-radius);
+  box-shadow: var(--settlement-shadow-lg);
+  overflow: hidden;
+}
+
+.settlement-datatable-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 1rem 1.25rem;
+  background: #f8fafc;
+  border-bottom: 1px solid var(--settlement-border);
+}
+
+.settlement-datatable-title {
+  font-size: 0.8125rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--settlement-text-muted);
+}
+
+.settlement-datatable-count {
+  font-size: 0.8125rem;
+  color: var(--settlement-text-muted);
+}
+
+/* ----- Table wrap (scroll) ----- */
+.settlement-table-wrap {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* ----- DataTable ----- */
+.settlement-datatable {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.settlement-datatable thead {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  background: #f8fafc;
+}
+
+.settlement-datatable th {
+  padding: 0.875rem 1.25rem;
+  text-align: left;
+  font-weight: 600;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--settlement-text-muted);
+  border-bottom: 1px solid var(--settlement-border);
+  white-space: nowrap;
+}
+
+.settlement-datatable td {
+  padding: 0.875rem 1.25rem;
+  border-bottom: 1px solid #f1f5f9;
+  color: var(--settlement-text);
+  vertical-align: middle;
+}
+
+.settlement-datatable tbody tr:hover {
+  background: #f8fafc;
+}
+
+.settlement-datatable tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.settlement-datatable tbody tr.settlement-row-alt {
+  background: #fafafa;
+}
+
+.settlement-datatable tbody tr.settlement-row-alt:hover {
+  background: #f1f5f9;
+}
+
+/* Cells */
+.settlement-cell-week {
+  font-weight: 500;
+  color: var(--settlement-text);
+}
+
+.settlement-cell-amount {
+  font-variant-numeric: tabular-nums;
+  font-weight: 500;
+}
+
+.settlement-cell-your {
+  color: var(--settlement-green);
+  font-weight: 600;
+}
+
+.settlement-cell-admin {
+  color: var(--settlement-text-muted);
+  font-weight: 500;
+}
+
+.settlement-cell-date {
+  font-size: 0.875rem;
+  color: var(--settlement-text-muted);
+}
+
+/* Badges */
+.settlement-badge {
+  display: inline-block;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.settlement-badge-settled {
+  background: var(--settlement-green-bg);
+  color: #047857;
+}
+
+.settlement-badge-pending {
+  background: var(--settlement-amber-bg);
+  color: var(--settlement-amber);
+}
+
+/* Empty state */
+.settlement-empty-cell {
+  text-align: center;
+  padding: 3rem 1.25rem !important;
+  color: var(--settlement-text-muted);
+  font-size: 0.9375rem;
+}
+
+.settlement-empty-icon {
+  display: block;
+  font-size: 1.5rem;
+  margin-bottom: 0.5rem;
+  opacity: 0.5;
+}

@@ -1,3 +1,11 @@
+.dashboard-loading,
+.dashboard-error {
+  margin: 0 0 1rem;
+  font-size: 0.95rem;
+}
+.dashboard-loading { color: #64748b; }
+.dashboard-error { color: #dc2626; }
+
 .dashboard-header {
   margin-bottom: 1.75rem;
 }

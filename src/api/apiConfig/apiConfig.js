@@ -1,14 +1,32 @@
 
 
-// Betting backend base URL. Use REACT_APP_BETTING_API_URL (or VITE_API_URL in Vite). Doc: BASE_URL/api/v1.
-const bettingUrl = process.env.REACT_APP_BETTING_API_URL || process.env.VITE_API_URL || "https://gamingbackend.wrathcode.com";
+// Backend base URL. Use REACT_APP_BETTING_API_URL (no trailing slash).
+const bettingUrl = (process.env.REACT_APP_BETTING_API_URL || process.env.VITE_API_URL || "http://localhost:5008").replace(/\/$/, "");
 
-
-
-
-export const deployedUrl = `${window.origin}/`
+export const deployedUrl = `${window.origin}/`;
 
 export const ApiConfig = {
+  // Sub-admin login: POST /api/v1/sub-admin/login (body: branchId+password OR branchName+password)
+  subAdminLogin: `${bettingUrl}/api/v1/sub-admin/login`,
+  // Sub-admin users: GET /api/v1/sub-admin/users?page=1&limit=20&search=
+  subAdminUsers: `${bettingUrl}/api/v1/sub-admin/users`,
+  // Sub-admin deposit details: POST /api/v1/sub-admin/deposit-details (body: type=bank, bankName, accountHolderName, accountNumber, ifscCode, displayOrder)
+  subAdminDepositDetails: `${bettingUrl}/api/v1/sub-admin/deposit-details`,
+  // Sub-admin UPI: POST /api/v1/sub-admin/deposit-details/upi (body: type=upi, upiId, upiName, qrImage?, minDeposit?, maxDeposit?, displayOrder)
+  subAdminDepositDetailsUpi: `${bettingUrl}/api/v1/sub-admin/deposit-details/upi`,
+  // Sub-admin deposit requests: GET .../deposit-requests, .../deposit-requests/pending, .../approved, .../rejected (optional ?page=&limit=)
+  subAdminDepositRequests: `${bettingUrl}/api/v1/sub-admin/deposit-requests`,
+  // Sub-admin dashboard: GET /api/v1/sub-admin/dashboard
+  subAdminDashboard: `${bettingUrl}/api/v1/sub-admin/dashboard`,
+  // Sub-admin withdrawal requests: GET .../withdrawal-requests, .../withdrawal-requests/pending|approved|rejected (optional ?page=&limit=); all: .../withdrawal-requests?status= optional
+  subAdminWithdrawalRequests: `${bettingUrl}/api/v1/sub-admin/withdrawal-requests`,
+  // Sub-admin collection, payout, profit/loss: GET /api/v1/sub-admin/collection-payout-profitloss
+  subAdminCollectionPayoutProfitloss: `${bettingUrl}/api/v1/sub-admin/collection-payout-profitloss`,
+  // Sub-admin approved transactions: GET /api/v1/sub-admin/approved-transactions (optional ?page=&limit=)
+  subAdminApprovedTransactions: `${bettingUrl}/api/v1/sub-admin/approved-transactions`,
+  // Sub-admin weekly settlement: GET /api/v1/sub-admin/weekly-settlement (single or list; optional ?page=&limit=)
+  subAdminWeeklySettlement: `${bettingUrl}/api/v1/sub-admin/weekly-settlement`,
+
   // =========Betting Auth Endpoints==========
   bettingSendOtp: "send-otp",
   bettingRegister: "register",

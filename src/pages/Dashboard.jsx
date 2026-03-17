@@ -1,19 +1,56 @@
-import { Link } from 'react-router-dom';
+import { useState, useEffect } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { ApiConfig } from '../api/apiConfig/apiConfig';
+import { ApiCallGet } from '../api/apiConfig/apiCall';
 import './Dashboard.css';
 
-const stats = [
-  { label: 'Total Agents', value: 12, icon: '👥', color: '#38bdf8' },
-  { label: 'Active Bets Today', value: 156, icon: '🎲', color: '#34d399' },
-  { label: 'Collection Today (₹)', value: '42,500', icon: '💰', color: '#fbbf24' },
-  { label: 'Payout Today (₹)', value: '28,100', icon: '📤', color: '#f87171' },
-];
-
-const pendingDeposits = 2;
-const pendingWithdrawals = 2;
+function formatAmount(n) {
+  if (n == null || n === undefined) return '—';
+  return `₹${Number(n).toLocaleString('en-IN')}`;
+}
 
 export default function Dashboard() {
   const { subadmin } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const [data, setData] = useState(null);
+
+  useEffect(() => {
+    let cancelled = false;
+    const token = sessionStorage.getItem('token');
+    ApiCallGet(ApiConfig.subAdminDashboard, { Authorization: token ? `Bearer ${token}` : '' })
+      .then((res) => {
+        if (cancelled) return;
+        if (res?.success === true && res?.data) {
+          setData(res.data);
+          setError('');
+        } else {
+          setError(res?.message || 'Failed to load dashboard');
+        }
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err?.message || 'Failed to load dashboard');
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false);
+      });
+    return () => { cancelled = true; };
+  }, []);
+
+  const stats = data
+    ? [
+        { label: 'Pending Deposits', value: data.pendingDepositCount ?? '—', icon: '⏳', color: '#f59e0b', isCount: true },
+        { label: 'Total Approved Deposits', value: formatAmount(data.totalApprovedDeposits), icon: '💰', color: '#38bdf8' },
+        { label: 'Deposits Today', value: formatAmount(data.totalDepositsToday), icon: '📥', color: '#34d399' },
+        { label: 'Deposits (7 days)', value: formatAmount(data.totalDeposits7Days), icon: '📊', color: '#34d399' },
+        { label: 'Deposits (30 days)', value: formatAmount(data.totalDeposits30Days), icon: '📈', color: '#38bdf8' },
+        { label: 'Pending Withdrawals', value: data.pendingWithdrawalCount ?? '—', icon: '⏳', color: '#f59e0b', isCount: true },
+        { label: 'Total Withdrawals', value: formatAmount(data.totalWithdrawals), icon: '💸', color: '#38bdf8' },
+        { label: 'Withdrawals Today', value: formatAmount(data.totalWithdrawalsToday), icon: '📤', color: '#34d399' },
+        { label: 'Withdrawals (7 days)', value: formatAmount(data.totalWithdrawals7Days), icon: '📊', color: '#34d399' },
+        { label: 'Withdrawals (30 days)', value: formatAmount(data.totalWithdrawals30Days), icon: '📈', color: '#38bdf8' },
+      ]
+    : [];
 
   return (
     <div className="dashboard">
@@ -21,24 +58,8 @@ export default function Dashboard() {
         <h1>Welcome, {subadmin?.name}</h1>
         <p>Subadmin dashboard – overview of your agents and bets</p>
       </header>
-      {(pendingDeposits > 0 || pendingWithdrawals > 0) && (
-        <div className="dashboard-alerts">
-          {pendingDeposits > 0 && (
-            <Link to="/deposits?filter=pending" className="alert-card alert-warning">
-              <span className="alert-icon">💰</span>
-              <span><strong>{pendingDeposits}</strong> pending deposit(s)</span>
-              <span className="alert-arrow">→</span>
-            </Link>
-          )}
-          {pendingWithdrawals > 0 && (
-            <Link to="/withdrawals?filter=pending" className="alert-card alert-info">
-              <span className="alert-icon">📤</span>
-              <span><strong>{pendingWithdrawals}</strong> pending withdrawal(s)</span>
-              <span className="alert-arrow">→</span>
-            </Link>
-          )}
-        </div>
-      )}
+      {loading && <p className="dashboard-loading">Loading dashboard…</p>}
+      {error && <p className="dashboard-error">{error}</p>}
       <div className="stats-grid">
         {stats.map((s) => (
           <div key={s.label} className="stat-card" style={{ '--accent': s.color }}>
@@ -50,12 +71,7 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-      <div className="dashboard-quicklinks">
-        <Link to="/users" className="quicklink">Manage Agents</Link>
-        <Link to="/bets" className="quicklink">View Bets</Link>
-        <Link to="/reports" className="quicklink">Reports</Link>
-        <Link to="/games" className="quicklink">Games</Link>
-      </div>
+     
       <section className="recent-section">
         <h2>Recent Activity</h2>
         <div className="activity-list">

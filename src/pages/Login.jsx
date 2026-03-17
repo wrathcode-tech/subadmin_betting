@@ -1,23 +1,37 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
 export default function Login() {
-  const [username, setUsername] = useState('');
+  const [branchIdOrName, setBranchIdOrName] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
-  const { login } = useAuth();
+  const [loading, setLoading] = useState(false);
+  const { subadmin, login } = useAuth();
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  useEffect(() => {
+    if (subadmin) {
+      navigate('/dashboard', { replace: true });
+    }
+  }, [subadmin, navigate]);
+
+  const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    const result = login(username, password);
-    if (result.success) {
-      navigate('/dashboard', { replace: true });
-    } else {
-      setError(result.message || 'Login failed');
+    setLoading(true);
+    try {
+      const result = await login(branchIdOrName, password);
+      if (result.success) {
+        navigate('/dashboard', { replace: true });
+      } else {
+        setError(result.message || 'Login failed');
+      }
+    } catch {
+      setError('Something went wrong. Please try again.');
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -25,20 +39,21 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <h1>Bookie Subadmin</h1>
-          <p>Subadmin login</p>
+          <h1>Subadmin Login</h1>
+          <p>Sign in with Branch ID or Branch Name</p>
         </div>
         <form onSubmit={handleSubmit} className="login-form">
           {error && <div className="login-error">{error}</div>}
           <label>
-            Username
+            Branch ID or Branch Name
             <input
               type="text"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              placeholder="subadmin"
+              value={branchIdOrName}
+              onChange={(e) => setBranchIdOrName(e.target.value)}
+              placeholder="e.g. BR001 or Main Branch"
               required
               autoComplete="username"
+              disabled={loading}
             />
           </label>
           <label>
@@ -50,11 +65,16 @@ export default function Login() {
               placeholder="••••••••"
               required
               autoComplete="current-password"
+              disabled={loading}
             />
           </label>
-          <button type="submit" className="login-btn">Login</button>
+          <button type="submit" className="login-btn" disabled={loading}>
+            {loading ? 'Signing in…' : 'Login'}
+          </button>
         </form>
-        <p className="login-hint">Demo: subadmin / subadmin123</p>
+        <p className="login-hint">
+          Use Branch ID (e.g. BR001) or Branch Name and your password.
+        </p>
       </div>
     </div>
   );

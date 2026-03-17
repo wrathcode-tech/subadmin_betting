@@ -1,4 +1,7 @@
 .reports-page .page-header { margin-bottom: 1.25rem; }
+.reports-loading, .reports-error { margin: 0 0 1rem; font-size: 0.95rem; }
+.reports-loading { color: #64748b; }
+.reports-error { color: #dc2626; }
 .reports-toolbar { margin-bottom: 1rem; display: flex; gap: 0.5rem; }
 .reports-toolbar .tab { padding: 0.5rem 1rem; background: #fff; border: 1px solid #e2e8f0; border-radius: 8px; color: #64748b; cursor: pointer; }
 .reports-toolbar .tab.active { background: #e0f2fe; color: #0284c7; border-color: #0ea5e9; }
@@ -23,7 +26,11 @@
 .report-value { font-size: 1.25rem; font-weight: 700; color: #0f172a; }
 .report-value.green { color: #059669; }
 .report-value.red { color: #dc2626; }
+.report-meta { font-size: 0.75rem; color: #94a3b8; margin-top: 0.15rem; }
+.reports-dw-summary { margin-bottom: 1rem; }
 .report-section h2 { margin: 0 0 1rem; font-size: 1.1rem; color: #1e293b; }
+.report-section .badge-deposit { background: #d1fae5; color: #065f46; }
+.report-section .badge-withdrawal { background: #fee2e2; color: #991b1b; }
 .report-section .table-wrap { background: #fff; border: 1px solid #e2e8f0; border-radius: 12px; overflow: auto; }
 .report-section .data-table td.green { color: #059669; font-weight: 600; }
 .report-section .data-table td.red { color: #dc2626; font-weight: 600; }

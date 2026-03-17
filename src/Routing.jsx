@@ -19,7 +19,9 @@ const Deposits = lazy(() => import('./pages/Deposits'));
 const Withdrawals = lazy(() => import('./pages/Withdrawals'));
 const Games = lazy(() => import('./pages/Games'));
 const Reports = lazy(() => import('./pages/Reports'));
+const SettlementDetails = lazy(() => import('./pages/SettlementDetails'));
 const Profile = lazy(() => import('./pages/Profile'));
+const ManageAccount = lazy(() => import('./pages/ManageAccount'));
 
 const Routing = memo(function Routing() {
   return (
@@ -38,6 +40,8 @@ const Routing = memo(function Routing() {
               <Route path="withdrawals" element={<Withdrawals />} />
               <Route path="games" element={<Games />} />
               <Route path="reports" element={<Reports />} />
+              <Route path="settlement-details" element={<SettlementDetails />} />
+              <Route path="manage-account" element={<ManageAccount />} />
               <Route path="profile" element={<Profile />} />
             </Route>
           </Route>
