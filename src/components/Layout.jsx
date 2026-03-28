@@ -25,7 +25,7 @@ export default function Layout() {
           withdrawals: Number(res.data.pendingWithdrawalCount || 0),
         });
       })
-      .catch(() => {});
+      .catch(() => { });
 
     return () => { cancelled = true; };
   }, []);
@@ -39,8 +39,8 @@ export default function Layout() {
     <div className="layout">
       <aside className="sidebar">
         <div className="sidebar-brand">
-          <span className="brand-icon">📊</span>
-          <span>{process.env.REACT_APP_TITLE || 'Branch Admin'}</span>
+          <span className="brand-icon"><img src="/favicon.svg" alt="logo" style={{ width: "70%" }} /></span>
+          <span>Subadmin</span>
         </div>
         <nav className="sidebar-nav">
           <div className="nav-category">

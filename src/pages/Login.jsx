@@ -41,8 +41,9 @@ export default function Login() {
     <div className="login-page">
       <div className="login-card">
         <div className="login-header">
-          <h1>Subadmin Login</h1>
-          <p>Sign in with Branch ID or Branch Name</p>
+        <img src="/logo.svg" alt="log" style={{width:"70%"}}/>
+          <p>Subadmin Login</p>
+          {/* <p>Sign in with Branch ID or Branch Name</p> */}
         </div>
         <form onSubmit={handleSubmit} className="login-form">
           {error && <div className="login-error">{error}</div>}
