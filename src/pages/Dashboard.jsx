@@ -71,27 +71,6 @@ export default function Dashboard() {
           </div>
         ))}
       </div>
-     
-      <section className="recent-section">
-        <h2>Recent Activity</h2>
-        <div className="activity-list">
-          <div className="activity-item">
-            <span className="activity-dot success" />
-            <span>Agent &quot;Raju&quot; placed bet #1023 – Cricket – ₹500</span>
-            <span className="activity-time">2 min ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-dot info" />
-            <span>Agent &quot;Suresh&quot; settled 5 bets – net +₹1,200</span>
-            <span className="activity-time">15 min ago</span>
-          </div>
-          <div className="activity-item">
-            <span className="activity-dot warning" />
-            <span>New agent &quot;Vijay&quot; added under your panel</span>
-            <span className="activity-time">1 hr ago</span>
-          </div>
-        </div>
-      </section>
     </div>
   );
 }

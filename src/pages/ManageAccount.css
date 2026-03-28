@@ -475,3 +475,10 @@
 .manage-account-page .detail-row:last-child {
   border-bottom: none;
 }
+
+.manage-crypto-address {
+  max-width: 220px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

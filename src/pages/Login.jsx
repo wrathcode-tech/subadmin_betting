@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import './Login.css';
 
@@ -10,12 +10,14 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const { subadmin, login } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  const from = location.state?.from?.pathname || '/dashboard';
 
   useEffect(() => {
     if (subadmin) {
-      navigate('/dashboard', { replace: true });
+      navigate(from, { replace: true });
     }
-  }, [subadmin, navigate]);
+  }, [subadmin, navigate, from]);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
@@ -24,7 +26,7 @@ export default function Login() {
     try {
       const result = await login(branchIdOrName, password);
       if (result.success) {
-        navigate('/dashboard', { replace: true });
+        navigate(from, { replace: true });
       } else {
         setError(result.message || 'Login failed');
       }

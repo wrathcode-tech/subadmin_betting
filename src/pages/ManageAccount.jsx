@@ -1,13 +1,15 @@
 import { useState, useMemo, useCallback, useEffect } from 'react';
 import Modal from '../components/Modal';
 import { ApiConfig } from '../api/apiConfig/apiConfig';
-import { ApiCallPost, ApiCallGet, ApiCallPatch } from '../api/apiConfig/apiCall';
+import Swal from 'sweetalert2';
+import { ApiCallPost, ApiCallGet, ApiCallPatch, ApiCallDelete } from '../api/apiConfig/apiCall';
 import { useToast } from '../context/ToastContext';
 import './Users.css';
 import './ManageAccount.css';
 
 const TAB_BANK = 'bank';
 const TAB_UPI = 'upi';
+const TAB_CRYPTO = 'crypto';
 const LIMIT = 20;
 
 const emptyBankForm = {
@@ -24,6 +26,15 @@ const emptyUpiForm = {
   upiId: '',
   displayName: '',
   qrImage: '',
+  minDeposit: '',
+  maxDeposit: '',
+  displayOrder: 0,
+  status: 'active',
+};
+
+const emptyCryptoForm = {
+  cryptoAddress: '',
+  cryptoChain: '',
   minDeposit: '',
   maxDeposit: '',
   displayOrder: 0,
@@ -64,19 +75,36 @@ function normalizeUpiItem(d) {
   };
 }
 
+function normalizeCryptoItem(d) {
+  return {
+    id: d._id,
+    cryptoAddress: d.cryptoAddress ?? '—',
+    cryptoChain: d.cryptoChain ?? '—',
+    minDeposit: d.minDeposit ?? '',
+    maxDeposit: d.maxDeposit ?? '',
+    displayOrder: d.displayOrder ?? 0,
+    status: d.isActive ? 'active' : 'inactive',
+    addedAt: formatAddedAt(d.createdAt),
+  };
+}
+
 export default function ManageAccount() {
   const { showToast } = useToast();
   const [activeTab, setActiveTab] = useState(TAB_BANK);
   const [accounts, setAccounts] = useState([]);
   const [upiList, setUpiList] = useState([]);
+  const [cryptoList, setCryptoList] = useState([]);
   const [filter, setFilter] = useState('all');
 
   const [bankListLoading, setBankListLoading] = useState(true);
   const [upiListLoading, setUpiListLoading] = useState(true);
+  const [cryptoListLoading, setCryptoListLoading] = useState(true);
   const [bankPage, setBankPage] = useState(1);
   const [upiPage, setUpiPage] = useState(1);
+  const [cryptoPage, setCryptoPage] = useState(1);
   const [bankPagination, setBankPagination] = useState({ page: 1, limit: LIMIT, total: 0, totalPages: 0 });
   const [upiPagination, setUpiPagination] = useState({ page: 1, limit: LIMIT, total: 0, totalPages: 0 });
+  const [cryptoPagination, setCryptoPagination] = useState({ page: 1, limit: LIMIT, total: 0, totalPages: 0 });
   const [listError, setListError] = useState('');
 
   const [viewAccount, setViewAccount] = useState(null);
@@ -94,6 +122,14 @@ export default function ManageAccount() {
   const [addUpiLoading, setAddUpiLoading] = useState(false);
   const [addUpiError, setAddUpiError] = useState('');
   const [editUpiLoading, setEditUpiLoading] = useState(false);
+
+  const [viewCrypto, setViewCrypto] = useState(null);
+  const [showAddCrypto, setShowAddCrypto] = useState(false);
+  const [editingCrypto, setEditingCrypto] = useState(null);
+  const [cryptoForm, setCryptoForm] = useState(emptyCryptoForm);
+  const [addCryptoLoading, setAddCryptoLoading] = useState(false);
+  const [addCryptoError, setAddCryptoError] = useState('');
+  const [editCryptoLoading, setEditCryptoLoading] = useState(false);
 
   const fetchBankList = useCallback(async (page = 1) => {
     setBankListLoading(true);
@@ -139,6 +175,28 @@ export default function ManageAccount() {
     });
   }, []);
 
+  const fetchCryptoList = useCallback(async (page = 1) => {
+    setCryptoListLoading(true);
+    setListError('');
+    const token = sessionStorage.getItem('token');
+    const url = `${ApiConfig.subAdminDepositDetails}?type=crypto&page=${page}&limit=${LIMIT}`;
+    const response = await ApiCallGet(url, { Authorization: token ? `Bearer ${token}` : '' });
+    setCryptoListLoading(false);
+    if (!response || response.success !== true) {
+      setCryptoList([]);
+      setListError(response?.message || 'Failed to load crypto wallet details.');
+      return;
+    }
+    const details = response.data?.details ?? [];
+    setCryptoList(details.map(normalizeCryptoItem));
+    setCryptoPagination({
+      page: response.data?.pagination?.page ?? 1,
+      limit: response.data?.pagination?.limit ?? LIMIT,
+      total: response.data?.pagination?.total ?? 0,
+      totalPages: response.data?.pagination?.totalPages ?? 0,
+    });
+  }, []);
+
   useEffect(() => {
     fetchBankList(bankPage);
   }, [bankPage, fetchBankList]);
@@ -146,6 +204,10 @@ export default function ManageAccount() {
   useEffect(() => {
     fetchUpiList(upiPage);
   }, [upiPage, fetchUpiList]);
+
+  useEffect(() => {
+    fetchCryptoList(cryptoPage);
+  }, [cryptoPage, fetchCryptoList]);
 
   const filteredAccounts = useMemo(() => {
     if (filter === 'all') return accounts;
@@ -156,6 +218,11 @@ export default function ManageAccount() {
     if (filter === 'all') return upiList;
     return upiList.filter((u) => u.status === filter);
   }, [upiList, filter]);
+
+  const filteredCrypto = useMemo(() => {
+    if (filter === 'all') return cryptoList;
+    return cryptoList.filter((c) => c.status === filter);
+  }, [cryptoList, filter]);
 
   // ——— Bank ———
   const openAddBank = () => {
@@ -319,6 +386,109 @@ export default function ManageAccount() {
     fetchUpiList(upiPage);
   };
 
+  // ——— Crypto ———
+  const openAddCrypto = () => {
+    setCryptoForm(emptyCryptoForm);
+    setShowAddCrypto(true);
+  };
+
+  const openEditCrypto = (row) => {
+    setEditingCrypto(row);
+    setCryptoForm({
+      cryptoAddress: row.cryptoAddress === '—' ? '' : row.cryptoAddress,
+      cryptoChain: row.cryptoChain === '—' ? '' : row.cryptoChain,
+      minDeposit: row.minDeposit !== undefined && row.minDeposit !== '' && row.minDeposit !== null ? String(row.minDeposit) : '',
+      maxDeposit: row.maxDeposit !== undefined && row.maxDeposit !== '' && row.maxDeposit !== null ? String(row.maxDeposit) : '',
+      displayOrder: row.displayOrder ?? 0,
+      status: row.status || 'active',
+    });
+  };
+
+  const closeEditCrypto = () => {
+    setEditingCrypto(null);
+    setCryptoForm(emptyCryptoForm);
+  };
+
+  const handleAddCryptoSubmit = async (e) => {
+    e.preventDefault();
+    setAddCryptoError('');
+    setAddCryptoLoading(true);
+    const token = sessionStorage.getItem('token');
+    const payload = {
+      type: 'crypto',
+      cryptoAddress: cryptoForm.cryptoAddress.trim(),
+      cryptoChain: cryptoForm.cryptoChain.trim(),
+      minDeposit: cryptoForm.minDeposit ? Number(cryptoForm.minDeposit) : null,
+      maxDeposit: cryptoForm.maxDeposit ? Number(cryptoForm.maxDeposit) : null,
+      displayOrder: Number(cryptoForm.displayOrder) || 0,
+    };
+    const response = await ApiCallPost(ApiConfig.subAdminDepositDetailsCrypto, payload, {
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    setAddCryptoLoading(false);
+    if (!response || response.success !== true) {
+      setAddCryptoError(response?.message || 'Failed to add crypto wallet.');
+      return;
+    }
+    setShowAddCrypto(false);
+    setCryptoForm(emptyCryptoForm);
+    showToast(response.message || 'Crypto wallet added', 'success');
+    fetchCryptoList(cryptoPage);
+  };
+
+  const handleEditCryptoSubmit = async (e) => {
+    e.preventDefault();
+    if (!editingCrypto) return;
+    setEditCryptoLoading(true);
+    const token = sessionStorage.getItem('token');
+    const url = `${ApiConfig.subAdminDepositDetails}/${editingCrypto.id}`;
+    const payload = {
+      isActive: cryptoForm.status === 'active',
+      cryptoAddress: cryptoForm.cryptoAddress.trim(),
+      cryptoChain: cryptoForm.cryptoChain.trim(),
+      minDeposit: cryptoForm.minDeposit ? Number(cryptoForm.minDeposit) : null,
+      maxDeposit: cryptoForm.maxDeposit ? Number(cryptoForm.maxDeposit) : null,
+      displayOrder: Number(cryptoForm.displayOrder) || 0,
+    };
+    const response = await ApiCallPatch(url, payload, {
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    setEditCryptoLoading(false);
+    if (!response || response.success !== true) {
+      showToast(response?.message || 'Failed to update crypto wallet.', 'error');
+      return;
+    }
+    showToast(response.message || 'Crypto wallet updated', 'success');
+    closeEditCrypto();
+    fetchCryptoList(cryptoPage);
+  };
+
+  const handleDeleteCrypto = async (row) => {
+    const result = await Swal.fire({
+      title: 'Delete crypto wallet?',
+      text: `Remove ${row.cryptoChain} address from deposit options?`,
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Delete',
+      cancelButtonText: 'Cancel',
+      confirmButtonColor: '#dc2626',
+    });
+    if (!result.isConfirmed) return;
+    const token = sessionStorage.getItem('token');
+    const response = await ApiCallDelete(`${ApiConfig.subAdminDepositDetails}/${row.id}`, {
+      'Content-Type': 'application/json',
+      Authorization: token ? `Bearer ${token}` : '',
+    });
+    if (!response || response.success !== true) {
+      showToast(response?.message || 'Failed to delete crypto wallet.', 'error');
+      return;
+    }
+    showToast(response.message || 'Crypto wallet removed', 'success');
+    fetchCryptoList(cryptoPage);
+  };
+
   return (
     <div className="manage-account-page manage-premium">
       <header className="manage-page-header">
@@ -326,7 +496,7 @@ export default function ManageAccount() {
           <span className="manage-header-icon" aria-hidden>◈</span>
           <div>
             <h1 className="manage-title">Manage Account Details</h1>
-            <p className="manage-subtitle">Add, edit and view your bank accounts and UPI details</p>
+            <p className="manage-subtitle">Add, edit and view bank accounts, UPI and crypto deposit details</p>
           </div>
         </div>
       </header>
@@ -346,6 +516,13 @@ export default function ManageAccount() {
         >
           UPI Details
         </button>
+        <button
+          type="button"
+          className={`manage-tab ${activeTab === TAB_CRYPTO ? 'active' : ''}`}
+          onClick={() => setActiveTab(TAB_CRYPTO)}
+        >
+          Crypto
+        </button>
       </div>
 
       <div className="manage-toolbar">
@@ -361,13 +538,19 @@ export default function ManageAccount() {
             </button>
           ))}
         </div>
-        {activeTab === TAB_BANK ? (
+        {activeTab === TAB_BANK && (
           <button type="button" className="manage-btn-primary" onClick={openAddBank}>
             + Add Bank Account
           </button>
-        ) : (
+        )}
+        {activeTab === TAB_UPI && (
           <button type="button" className="manage-btn-primary" onClick={openAddUpi}>
             + Add UPI
+          </button>
+        )}
+        {activeTab === TAB_CRYPTO && (
+          <button type="button" className="manage-btn-primary" onClick={openAddCrypto}>
+            + Add Crypto Wallet
           </button>
         )}
       </div>
@@ -508,6 +691,78 @@ export default function ManageAccount() {
         </div>
       )}
 
+      {activeTab === TAB_CRYPTO && (
+        <div className="manage-datatable-card">
+          <div className="manage-datatable-header">
+            <span className="manage-datatable-title">Crypto wallets</span>
+            {!cryptoListLoading && (
+              <span className="manage-datatable-count">{cryptoPagination.total} record{cryptoPagination.total !== 1 ? 's' : ''}</span>
+            )}
+          </div>
+          {cryptoListLoading ? (
+            <div className="manage-loading-state">
+              <span className="manage-loading-spinner" />
+              <p className="manage-loading-text">Loading crypto wallets…</p>
+            </div>
+          ) : (
+            <>
+              <div className="manage-table-wrap">
+                <table className="manage-datatable" role="grid">
+                  <thead>
+                    <tr>
+                      <th scope="col">Chain</th>
+                      <th scope="col">Address</th>
+                      <th scope="col">Min</th>
+                      <th scope="col">Max</th>
+                      <th scope="col">Order</th>
+                      <th scope="col">Status</th>
+                      <th scope="col">Added</th>
+                      <th scope="col">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {filteredCrypto.length === 0 ? (
+                      <tr>
+                        <td colSpan={8} className="manage-empty-cell">
+                          <span className="manage-empty-icon">—</span>
+                          No crypto wallets found
+                        </td>
+                      </tr>
+                    ) : (
+                      filteredCrypto.map((c, index) => (
+                        <tr key={c.id} className={index % 2 === 1 ? 'manage-row-alt' : ''}>
+                          <td className="manage-cell">{c.cryptoChain}</td>
+                          <td className="manage-cell manage-cell-mono manage-crypto-address" title={c.cryptoAddress}>{c.cryptoAddress}</td>
+                          <td className="manage-cell manage-cell-muted">{c.minDeposit === '' || c.minDeposit == null ? '—' : c.minDeposit}</td>
+                          <td className="manage-cell manage-cell-muted">{c.maxDeposit === '' || c.maxDeposit == null ? '—' : c.maxDeposit}</td>
+                          <td className="manage-cell manage-cell-muted">{c.displayOrder}</td>
+                          <td><span className={`manage-badge manage-badge-${c.status}`}>{c.status}</span></td>
+                          <td className="manage-cell manage-cell-muted">{c.addedAt}</td>
+                          <td>
+                            <div className="manage-action-btns">
+                              <button type="button" className="manage-btn-sm" onClick={() => setViewCrypto(c)}>View</button>
+                              <button type="button" className="manage-btn-sm manage-btn-sm-primary" onClick={() => openEditCrypto(c)}>Edit</button>
+                              <button type="button" className="manage-btn-sm" onClick={() => handleDeleteCrypto(c)}>Delete</button>
+                            </div>
+                          </td>
+                        </tr>
+                      ))
+                    )}
+                  </tbody>
+                </table>
+              </div>
+              {cryptoPagination.totalPages > 1 && (
+                <div className="manage-pagination">
+                  <button type="button" className="manage-btn-sm" disabled={cryptoPage <= 1} onClick={() => setCryptoPage((p) => Math.max(1, p - 1))}>Previous</button>
+                  <span className="manage-pagination-info">Page {cryptoPagination.page} of {cryptoPagination.totalPages} ({cryptoPagination.total} total)</span>
+                  <button type="button" className="manage-btn-sm" disabled={cryptoPage >= cryptoPagination.totalPages} onClick={() => setCryptoPage((p) => p + 1)}>Next</button>
+                </div>
+              )}
+            </>
+          )}
+        </div>
+      )}
+
       {/* Bank View modal */}
       {viewAccount && (
         <Modal title="Bank Account Details" onClose={() => setViewAccount(null)}>
@@ -606,6 +861,58 @@ export default function ManageAccount() {
             <div className="form-actions">
               <button type="button" className="btn-sm" onClick={closeEditUpi} disabled={editUpiLoading}>Cancel</button>
               <button type="submit" className="btn-primary" disabled={editUpiLoading}>{editUpiLoading ? 'Saving…' : 'Save Changes'}</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Crypto View modal */}
+      {viewCrypto && (
+        <Modal title="Crypto Wallet" onClose={() => setViewCrypto(null)}>
+          <div className="detail-row"><strong>Chain</strong><span>{viewCrypto.cryptoChain}</span></div>
+          <div className="detail-row"><strong>Address</strong><span style={{ wordBreak: 'break-all' }}>{viewCrypto.cryptoAddress}</span></div>
+          <div className="detail-row"><strong>Min deposit</strong><span>{viewCrypto.minDeposit === '' || viewCrypto.minDeposit == null ? '—' : viewCrypto.minDeposit}</span></div>
+          <div className="detail-row"><strong>Max deposit</strong><span>{viewCrypto.maxDeposit === '' || viewCrypto.maxDeposit == null ? '—' : viewCrypto.maxDeposit}</span></div>
+          <div className="detail-row"><strong>Display order</strong><span>{viewCrypto.displayOrder}</span></div>
+          <div className="detail-row"><strong>Status</strong><span className={`badge ${viewCrypto.status}`}>{viewCrypto.status}</span></div>
+          <div className="detail-row"><strong>Added on</strong><span>{viewCrypto.addedAt}</span></div>
+        </Modal>
+      )}
+
+      {/* Crypto Add modal */}
+      {showAddCrypto && (
+        <Modal title="Add Crypto Wallet" onClose={() => { setShowAddCrypto(false); setCryptoForm(emptyCryptoForm); setAddCryptoError(''); }}>
+          <form onSubmit={handleAddCryptoSubmit} className="profile-form">
+            {addCryptoError && <div className="login-error" style={{ marginBottom: '1rem' }}>{addCryptoError}</div>}
+            <label>Crypto address * <input type="text" value={cryptoForm.cryptoAddress} onChange={(e) => setCryptoForm((f) => ({ ...f, cryptoAddress: e.target.value }))} placeholder="0x… or TRC20 address" required disabled={addCryptoLoading} /></label>
+            <label>Chain * <input type="text" value={cryptoForm.cryptoChain} onChange={(e) => setCryptoForm((f) => ({ ...f, cryptoChain: e.target.value }))} placeholder="e.g. BEP20, TRC20" required disabled={addCryptoLoading} /></label>
+            <label>Min deposit <input type="number" value={cryptoForm.minDeposit} onChange={(e) => setCryptoForm((f) => ({ ...f, minDeposit: e.target.value }))} placeholder="100" min={0} disabled={addCryptoLoading} /></label>
+            <label>Max deposit <input type="number" value={cryptoForm.maxDeposit} onChange={(e) => setCryptoForm((f) => ({ ...f, maxDeposit: e.target.value }))} placeholder="500000" min={0} disabled={addCryptoLoading} /></label>
+            <label>Display order <input type="number" value={cryptoForm.displayOrder} onChange={(e) => setCryptoForm((f) => ({ ...f, displayOrder: e.target.value }))} placeholder="0" min={0} disabled={addCryptoLoading} /></label>
+            <div className="form-actions">
+              <button type="button" className="btn-sm" onClick={() => { setShowAddCrypto(false); setCryptoForm(emptyCryptoForm); setAddCryptoError(''); }} disabled={addCryptoLoading}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={addCryptoLoading}>{addCryptoLoading ? 'Adding…' : 'Add wallet'}</button>
+            </div>
+          </form>
+        </Modal>
+      )}
+
+      {/* Crypto Edit modal */}
+      {editingCrypto && (
+        <Modal title="Edit Crypto Wallet" onClose={closeEditCrypto}>
+          <form onSubmit={handleEditCryptoSubmit} className="profile-form">
+            <label>Crypto address * <input type="text" value={cryptoForm.cryptoAddress} onChange={(e) => setCryptoForm((f) => ({ ...f, cryptoAddress: e.target.value }))} required disabled={editCryptoLoading} /></label>
+            <label>Chain * <input type="text" value={cryptoForm.cryptoChain} onChange={(e) => setCryptoForm((f) => ({ ...f, cryptoChain: e.target.value }))} required disabled={editCryptoLoading} /></label>
+            <label>Min deposit <input type="number" value={cryptoForm.minDeposit} onChange={(e) => setCryptoForm((f) => ({ ...f, minDeposit: e.target.value }))} min={0} disabled={editCryptoLoading} /></label>
+            <label>Max deposit <input type="number" value={cryptoForm.maxDeposit} onChange={(e) => setCryptoForm((f) => ({ ...f, maxDeposit: e.target.value }))} min={0} disabled={editCryptoLoading} /></label>
+            <label>Display order <input type="number" value={cryptoForm.displayOrder} onChange={(e) => setCryptoForm((f) => ({ ...f, displayOrder: e.target.value }))} min={0} disabled={editCryptoLoading} /></label>
+            <label>Status <select value={cryptoForm.status} onChange={(e) => setCryptoForm((f) => ({ ...f, status: e.target.value }))} disabled={editCryptoLoading}>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select></label>
+            <div className="form-actions">
+              <button type="button" className="btn-sm" onClick={closeEditCrypto} disabled={editCryptoLoading}>Cancel</button>
+              <button type="submit" className="btn-primary" disabled={editCryptoLoading}>{editCryptoLoading ? 'Saving…' : 'Save changes'}</button>
             </div>
           </form>
         </Modal>

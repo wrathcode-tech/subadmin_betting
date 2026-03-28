@@ -13,18 +13,25 @@ function formatDate(iso) {
   return new Date(iso).toLocaleString('en-IN', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
 }
 
+function resolveMediaUrl(url) {
+  if (!url) return '';
+  // Keep absolute URLs as-is; prepend backend base for relative paths.
+  if (/^https?:\/\//i.test(url) || url.startsWith('data:')) return url;
+  return `${ApiConfig.baseBettingUrl}${url.startsWith('/') ? '' : '/'}${url}`;
+}
+
 function normalizeDeposit(d) {
   const user = d.userId;
   return {
     id: d._id,
     transactionId: d.transactionId || d._id,
-    userName: user?.fullName || user?.email || '—',
+    userName: user?.username || user?.email || '—',
     userUuid: user?.uuid,
     amount: d.amount,
     currency: d.currency || 'INR',
     status: d.status,
     utrNumber: d.utrNumber || '—',
-    paymentProofUrl: d.paymentProofUrl,
+    paymentProofUrl: resolveMediaUrl(d.paymentProofUrl),
     paymentMethod: d.paymentMethod || '—',
     createdAt: d.createdAt,
     createdAtFormatted: formatDate(d.createdAt),
@@ -194,7 +201,12 @@ export default function Deposits() {
                     <td className="muted">{d.createdAtFormatted}</td>
                     <td>
                       {d.paymentProofUrl ? (
-                        <a href={d.paymentProofUrl} target="_blank" rel="noopener noreferrer" className="btn-sm">View</a>
+                        <img style={{ maxHeight: '100px', maxWidth: '100px' }}
+                        src={d.paymentProofUrl}
+                        crossOrigin="anonymous"
+                        alt="Payment proof preview"
+                        className="max-h-[75vh] w-auto max-w-full rounded-xl border border-gray-200 bg-gray-50 object-contain"
+                      />
                       ) : (
                         <span className="muted">—</span>
                       )}

@@ -22,6 +22,7 @@ function normalizeSubAdmin(apiSubAdmin) {
 
 export function AuthProvider({ children }) {
   const [subadmin, setSubadmin] = useState(null);
+  const [authReady, setAuthReady] = useState(false);
 
   useEffect(() => {
     const saved = localStorage.getItem('bookie_subadmin');
@@ -32,6 +33,7 @@ export function AuthProvider({ children }) {
         // ignore invalid saved auth
       }
     }
+    setAuthReady(true);
   }, []);
 
   const login = async (branchIdOrName, password) => {
@@ -81,7 +83,7 @@ export function AuthProvider({ children }) {
   };
 
   return (
-    <AuthContext.Provider value={{ subadmin, login, logout }}>
+    <AuthContext.Provider value={{ subadmin, login, logout, authReady }}>
       {children}
     </AuthContext.Provider>
   );

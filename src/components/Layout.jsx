@@ -1,10 +1,34 @@
+import { useEffect, useState } from 'react';
 import { NavLink, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { ApiConfig } from '../api/apiConfig/apiConfig';
+import { ApiCallGet } from '../api/apiConfig/apiCall';
 import './Layout.css';
 
 export default function Layout() {
   const { subadmin, logout } = useAuth();
   const navigate = useNavigate();
+  const [pendingCounts, setPendingCounts] = useState({
+    deposits: 0,
+    withdrawals: 0,
+  });
+
+  useEffect(() => {
+    let cancelled = false;
+    const token = sessionStorage.getItem('token');
+
+    ApiCallGet(ApiConfig.subAdminDashboard, { Authorization: token ? `Bearer ${token}` : '' })
+      .then((res) => {
+        if (cancelled || res?.success !== true || !res?.data) return;
+        setPendingCounts({
+          deposits: Number(res.data.pendingDepositCount || 0),
+          withdrawals: Number(res.data.pendingWithdrawalCount || 0),
+        });
+      })
+      .catch(() => {});
+
+    return () => { cancelled = true; };
+  }, []);
 
   const handleLogout = () => {
     logout();
@@ -34,10 +58,22 @@ export default function Layout() {
           <div className="nav-category">
             <span className="nav-category-label">Transactions</span>
             <NavLink to="/deposits" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              Deposits
+              <span>Deposits</span>
+              {pendingCounts.deposits > 0 && (
+                <span className="nav-count-badge">{pendingCounts.deposits}</span>
+              )}
             </NavLink>
             <NavLink to="/withdrawals" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              Withdrawals
+              <span>Withdrawals</span>
+              {pendingCounts.withdrawals > 0 && (
+                <span className="nav-count-badge">{pendingCounts.withdrawals}</span>
+              )}
+            </NavLink>
+          </div>
+          <div className="nav-category">
+            <span className="nav-category-label">Support</span>
+            <NavLink to="/support" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
+              Support
             </NavLink>
           </div>
           <div className="nav-category">

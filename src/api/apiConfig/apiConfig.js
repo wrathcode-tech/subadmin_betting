@@ -14,6 +14,8 @@ export const ApiConfig = {
   subAdminDepositDetails: `${bettingUrl}/api/v1/sub-admin/deposit-details`,
   // Sub-admin UPI: POST /api/v1/sub-admin/deposit-details/upi (body: type=upi, upiId, upiName, qrImage?, minDeposit?, maxDeposit?, displayOrder)
   subAdminDepositDetailsUpi: `${bettingUrl}/api/v1/sub-admin/deposit-details/upi`,
+  // Sub-admin crypto: POST /api/v1/sub-admin/deposit-details/crypto (body: type=crypto, cryptoAddress, cryptoChain, minDeposit?, maxDeposit?, displayOrder?)
+  subAdminDepositDetailsCrypto: `${bettingUrl}/api/v1/sub-admin/deposit-details/crypto`,
   // Sub-admin deposit requests: GET .../deposit-requests, .../deposit-requests/pending, .../approved, .../rejected (optional ?page=&limit=)
   subAdminDepositRequests: `${bettingUrl}/api/v1/sub-admin/deposit-requests`,
   // Sub-admin dashboard: GET /api/v1/sub-admin/dashboard
@@ -26,6 +28,8 @@ export const ApiConfig = {
   subAdminApprovedTransactions: `${bettingUrl}/api/v1/sub-admin/approved-transactions`,
   // Sub-admin weekly settlement: GET /api/v1/sub-admin/weekly-settlement (single or list; optional ?page=&limit=)
   subAdminWeeklySettlement: `${bettingUrl}/api/v1/sub-admin/weekly-settlement`,
+  // Sub-admin support: GET .../support/tickets?status=open|resolved&page=&limit=, GET .../support/tickets/:ticketId, POST .../support/tickets/:ticketId/reply, PATCH .../support/tickets/:ticketId/status
+  subAdminSupportTickets: `${bettingUrl}/api/v1/sub-admin/support/tickets`,
 
   // =========Betting Auth Endpoints==========
   bettingSendOtp: "send-otp",
