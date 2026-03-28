@@ -52,7 +52,7 @@ export default function Layout() {
           <div className="nav-category">
             <span className="nav-category-label">Users</span>
             <NavLink to="/users" className={({ isActive }) => isActive ? 'nav-item active' : 'nav-item'}>
-              Users / Agents
+              Users
             </NavLink>
           </div>
           <div className="nav-category">

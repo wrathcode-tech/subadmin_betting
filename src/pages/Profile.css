@@ -19,3 +19,70 @@
   border: none; border-radius: 8px; font-weight: 600; cursor: pointer;
 }
 .btn-primary:hover { background: #0284c7; }
+
+.profile-loading {
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+.profile-error {
+  padding: 0.75rem 1rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 0.9375rem;
+}
+.profile-page .detail-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9375rem;
+}
+.profile-page .detail-row:last-child {
+  border-bottom: none;
+}
+.profile-page .detail-row strong {
+  color: #475569;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+.profile-page .detail-row span {
+  text-align: right;
+  word-break: break-word;
+}
+.profile-muted {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9375rem;
+}
+.profile-permissions-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.profile-permission-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f1f5f9;
+  font-size: 0.9375rem;
+}
+.profile-permission-item:last-child {
+  border-bottom: none;
+}
+.profile-permission-label {
+  color: #334155;
+}
+.profile-permission-yes {
+  color: #059669;
+  font-weight: 600;
+}
+.profile-permission-no {
+  color: #94a3b8;
+  font-weight: 600;
+}

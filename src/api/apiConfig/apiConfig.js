@@ -8,8 +8,12 @@ export const deployedUrl = `${window.origin}/`;
 export const ApiConfig = {
   // Sub-admin login: POST /api/v1/sub-admin/login (body: branchId+password OR branchName+password)
   subAdminLogin: `${bettingUrl}/api/v1/sub-admin/login`,
+  // Sub-admin profile: GET /api/v1/sub-admin/me (Bearer)
+  subAdminMe: `${bettingUrl}/api/v1/sub-admin/me`,
   // Sub-admin users: GET /api/v1/sub-admin/users?page=1&limit=20&search=
   subAdminUsers: `${bettingUrl}/api/v1/sub-admin/users`,
+  // Sub-admin referred users: GET /api/v1/sub-admin/referred-users?page=&limit=&search=
+  subAdminReferredUsers: `${bettingUrl}/api/v1/sub-admin/referred-users`,
   // Sub-admin deposit details: POST /api/v1/sub-admin/deposit-details (body: type=bank, bankName, accountHolderName, accountNumber, ifscCode, displayOrder)
   subAdminDepositDetails: `${bettingUrl}/api/v1/sub-admin/deposit-details`,
   // Sub-admin UPI: POST /api/v1/sub-admin/deposit-details/upi (body: type=upi, upiId, upiName, qrImage?, minDeposit?, maxDeposit?, displayOrder)

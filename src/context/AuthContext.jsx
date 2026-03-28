@@ -1,6 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { ApiConfig } from '../api/apiConfig/apiConfig';
-import { ApiCallPost } from '../api/apiConfig/apiCall';
+import { ApiCallPost, ApiCallGet } from '../api/apiConfig/apiCall';
 
 const AuthContext = createContext(null);
 
@@ -16,6 +16,10 @@ function normalizeSubAdmin(apiSubAdmin) {
     branchId: apiSubAdmin.branchId,
     branchName: apiSubAdmin.branchName,
     permissions: apiSubAdmin.permissions ?? {},
+    referralCode: apiSubAdmin.referralCode,
+    commissionSharing: apiSubAdmin.commissionSharing,
+    createdAt: apiSubAdmin.createdAt,
+    updatedAt: apiSubAdmin.updatedAt,
     role: 'subadmin',
   };
 }
@@ -82,8 +86,35 @@ export function AuthProvider({ children }) {
     sessionStorage.removeItem('token');
   };
 
+  /** GET /api/v1/sub-admin/me — updates context + localStorage when successful */
+  const refreshSubAdmin = useCallback(async () => {
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      return { success: false, message: 'Not signed in.' };
+    }
+    const response = await ApiCallGet(ApiConfig.subAdminMe, {
+      Authorization: `Bearer ${token}`,
+      'Content-Type': 'application/json',
+    });
+    if (!response) {
+      return { success: false, message: 'Network error.' };
+    }
+    if (response.success !== true || !response.data?.subAdmin) {
+      return {
+        success: false,
+        message: response.message || 'Could not load profile.',
+      };
+    }
+    const user = normalizeSubAdmin(response.data.subAdmin);
+    setSubadmin(user);
+    localStorage.setItem('bookie_subadmin', JSON.stringify(user));
+    return response;
+  }, []);
+
   return (
-    <AuthContext.Provider value={{ subadmin, login, logout, authReady }}>
+    <AuthContext.Provider
+      value={{ subadmin, login, logout, authReady, refreshSubAdmin }}
+    >
       {children}
     </AuthContext.Provider>
   );

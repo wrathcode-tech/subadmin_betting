@@ -16,6 +16,37 @@
   font-size: 0.95rem;
 }
 
+.users-list-tabs {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  flex-wrap: wrap;
+}
+
+.users-main-tab {
+  padding: 0.55rem 1.1rem;
+  background: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 8px;
+  color: #64748b;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.users-main-tab:hover {
+  color: #1e293b;
+  border-color: #cbd5e1;
+  background: #f8fafc;
+}
+
+.users-main-tab.active {
+  background: #0f172a;
+  color: #fff;
+  border-color: #0f172a;
+}
+
 .toolbar {
   display: flex;
   align-items: center;
