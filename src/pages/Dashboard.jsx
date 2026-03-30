@@ -39,6 +39,13 @@ export default function Dashboard() {
 
   const stats = data
     ? [
+        {
+          label: 'Overall profit',
+          value: formatAmount(data.overallProfit?.totalProfit),
+          icon: '📈',
+          color: '#0f172a',
+          key: 'overall-profit',
+        },
         { label: 'Pending Deposits', value: data.pendingDepositCount ?? '—', icon: '⏳', color: '#f59e0b', isCount: true },
         { label: 'Total Approved Deposits', value: formatAmount(data.totalApprovedDeposits), icon: '💰', color: '#38bdf8' },
         { label: 'Deposits Today', value: formatAmount(data.totalDepositsToday), icon: '📥', color: '#34d399' },
@@ -62,7 +69,7 @@ export default function Dashboard() {
       {error && <p className="dashboard-error">{error}</p>}
       <div className="stats-grid">
         {stats.map((s) => (
-          <div key={s.label} className="stat-card" style={{ '--accent': s.color }}>
+          <div key={s.key || s.label} className="stat-card" style={{ '--accent': s.color }}>
             <span className="stat-icon">{s.icon}</span>
             <div className="stat-content">
               <span className="stat-value">{s.value}</span>

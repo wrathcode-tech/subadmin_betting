@@ -32,6 +32,8 @@ export const ApiConfig = {
   subAdminApprovedTransactions: `${bettingUrl}/api/v1/sub-admin/approved-transactions`,
   // Sub-admin weekly settlement: GET /api/v1/sub-admin/weekly-settlement (single or list; optional ?page=&limit=)
   subAdminWeeklySettlement: `${bettingUrl}/api/v1/sub-admin/weekly-settlement`,
+  // Sub-admin weekly profit snapshot: GET /api/v1/sub-admin/weekly-profit
+  subAdminWeeklyProfit: `${bettingUrl}/api/v1/sub-admin/weekly-profit`,
   // Sub-admin support: GET .../support/tickets?status=open|resolved&page=&limit=, GET .../support/tickets/:ticketId, POST .../support/tickets/:ticketId/reply, PATCH .../support/tickets/:ticketId/status
   subAdminSupportTickets: `${bettingUrl}/api/v1/sub-admin/support/tickets`,
 

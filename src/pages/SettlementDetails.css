@@ -250,3 +250,111 @@
   margin-bottom: 0.5rem;
   opacity: 0.5;
 }
+
+/* ----- Weekly profit (GET /sub-admin/weekly-profit) ----- */
+.weekly-profit-week-banner {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+  padding: 1rem 1.25rem;
+  margin-bottom: 1.25rem;
+  background: var(--settlement-card-bg);
+  border: 1px solid var(--settlement-border);
+  border-radius: var(--settlement-radius);
+  box-shadow: var(--settlement-shadow);
+}
+
+.weekly-profit-week-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--settlement-text-muted);
+}
+
+.weekly-profit-week-value {
+  font-size: 1.05rem;
+  font-weight: 600;
+  color: var(--settlement-text);
+}
+
+.weekly-profit-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.weekly-profit-stat {
+  padding: 1.1rem 1.15rem;
+  background: var(--settlement-card-bg);
+  border: 1px solid var(--settlement-border);
+  border-radius: var(--settlement-radius);
+  box-shadow: var(--settlement-shadow);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.weekly-profit-stat-highlight {
+  border-color: #cbd5e1;
+  background: linear-gradient(180deg, #f8fafc 0%, #fff 100%);
+}
+
+.weekly-profit-stat-label {
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--settlement-text-muted);
+}
+
+.weekly-profit-stat-value {
+  font-size: 1.2rem;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  color: var(--settlement-text);
+}
+
+.weekly-profit-stat-value.weekly-profit-stat-yours {
+  color: var(--settlement-green);
+}
+
+.weekly-profit-stat-value.weekly-profit-stat-master {
+  color: var(--settlement-text-muted);
+}
+
+.weekly-profit-meta {
+  padding: 1rem 1.25rem;
+  background: var(--settlement-card-bg);
+  border: 1px solid var(--settlement-border);
+  border-radius: var(--settlement-radius);
+  box-shadow: var(--settlement-shadow);
+}
+
+.weekly-profit-meta-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  font-size: 0.9rem;
+}
+
+.weekly-profit-meta-row + .weekly-profit-meta-row {
+  border-top: 1px solid #f1f5f9;
+  margin-top: 0.25rem;
+  padding-top: 0.75rem;
+}
+
+.weekly-profit-meta-key {
+  color: var(--settlement-text-muted);
+  flex-shrink: 0;
+}
+
+.weekly-profit-meta-val {
+  text-align: right;
+  word-break: break-all;
+  color: var(--settlement-text);
+  font-variant-numeric: tabular-nums;
+}
